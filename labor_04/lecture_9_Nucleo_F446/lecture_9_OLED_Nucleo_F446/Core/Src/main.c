@@ -31,7 +31,7 @@
 /* USER CODE BEGIN PTD */
 
 // Enumeration for state machine
-typedef enum
+/*typedef enum
 {
     OLED_STATE_CCE = 0x00,          // Crystal Clear Electronics
     OLED_STATE_FONTS = 0x01,        // Character set review
@@ -40,6 +40,20 @@ typedef enum
     OLED_STATE_CIRCLE = 0x04,       // Pipe - Circle screen saver
     OLED_STATE_ARC = 0x05,          // Arc
     OLED_STATE_POLYLINE = 0x06      // Polyline
+} OLED_Test_state;*/
+
+typedef enum
+{
+    OLED_STATE_CCE = 0x00,
+    OLED_STATE_FONTS = 0x01,
+    OLED_STATE_LINE = 0x02,
+    OLED_STATE_RECTANGLE = 0x03,
+    OLED_STATE_CIRCLE = 0x04,
+    OLED_STATE_ARC = 0x05,
+    OLED_STATE_POLYLINE = 0x06,
+    OLED_STATE_OWN = 0x07,
+	OLED_STATE_ASCII = 0x08
+
 } OLED_Test_state;
 
 /* USER CODE END PTD */
@@ -177,6 +191,53 @@ void OLED_TestCCE()
     return;
 }
 
+// Own screen
+void OLED_TestOwnScreen()
+{
+    OLED_Fill(BLACK);
+
+    // Rectangle frame
+    OLED_DrawRectangle(1, 1, 126, 62, WHITE);
+
+    // Circles in the corners
+    OLED_DrawCircle(7, 7, 4, WHITE);
+    OLED_DrawCircle(120, 7, 4, WHITE);
+    OLED_DrawCircle(7, 56, 4, WHITE);
+    OLED_DrawCircle(120, 56, 4, WHITE);
+
+    // Name
+    OLED_SetCursor(31, 17);
+    OLED_WriteString("LORAND", Font_11x18, WHITE);
+
+    // Course
+    OLED_SetCursor(16, 39);
+    OLED_WriteString("Mikroprocesszorok", Font_6x8, WHITE);
+
+    return;
+}
+
+void OLED_TestASCII()
+{
+    OLED_Fill(BLACK);
+
+    OLED_SetCursor(34, 8);
+    OLED_WriteString(" .------. ", Font_6x8, WHITE);
+
+    OLED_SetCursor(34, 16);
+    OLED_WriteString(" | o  o | ", Font_6x8, WHITE);
+
+    OLED_SetCursor(34, 24);
+    OLED_WriteString(" |  --  | ", Font_6x8, WHITE);
+
+    OLED_SetCursor(34, 32);
+    OLED_WriteString(" '------' ", Font_6x8, WHITE);
+
+    OLED_SetCursor(34, 40);
+    OLED_WriteString("  /|  |\\ ", Font_6x8, WHITE);
+
+    OLED_SetCursor(34, 48);
+    OLED_WriteString(" /_|__|_\\ ", Font_6x8, WHITE);
+}
 /* USER CODE END 0 */
 
 /**
@@ -234,7 +295,7 @@ int main(void)
 	    {
 	        if(OLED_STATE_CCE == test_state)
 	        {
-	            test_state = OLED_STATE_POLYLINE;
+	            test_state = OLED_STATE_ASCII;
 	        }
 	        else
 	        {
@@ -249,7 +310,7 @@ int main(void)
 	    // Right button
 	    if ((current_button_state[2] != previous_button_state[2]) && (GPIO_PIN_RESET == current_button_state[2]))
 	    {
-	        if(OLED_STATE_POLYLINE == test_state)
+	        if(OLED_STATE_ASCII == test_state)
 	        {
 	            test_state = OLED_STATE_CCE;
 	        }
@@ -309,6 +370,13 @@ int main(void)
 	    case OLED_STATE_POLYLINE:		// Polyline
 	        OLED_TestPolyline();
 	        break;
+
+	    case OLED_STATE_OWN:			// Own
+	        OLED_TestOwnScreen();
+	        break;
+	    case OLED_STATE_ASCII:
+	    	        OLED_TestASCII();
+	    	        break;
 	    case OLED_STATE_CCE:   			 // Crystal Clear Electronics
 	    default:
 	        OLED_TestCCE();
